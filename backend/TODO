@@ -1,0 +1,24 @@
+Set up docker for production and development
+
+    -
+
+Write model schemas 
+
+Write Apis for the frontend
+    - Create blog post x
+    - read blog post x
+    - like blog post x
+    - dislike blog post x
+    - create table of content of a blog post
+    
+    
+    
+    
+    - comment on blog post
+    - reply blog post
+    - create new user
+    - login to accout
+    - list all category
+    - list all tags
+    - view
+

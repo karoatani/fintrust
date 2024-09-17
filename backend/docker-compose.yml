@@ -1,0 +1,41 @@
+name: blog_app
+
+services:
+  web:
+    build:
+      context: .
+    ports:
+      - 8000:8000
+    volumes:
+      - app_data:/app/backend/
+      
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:12.20-alpine3.20
+    restart: always
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: babe
+      DB_NAME: postgres
+      POSTGRES_PASSWORD: babe
+      
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
+  app_data:
+  
