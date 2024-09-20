@@ -5,12 +5,15 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import (
     BlogPost,
-    Reaction
+    Reaction,
+    Comment
     )
 from .serializers import (
     BlogPostCreateSerializer,
     BlogPostSerializer,
-    BlogPostReactionSerializer
+    BlogPostReactionSerializer,
+    BlogCommentSerializer,
+    BlogReplySerializer
     )
 
 # Create your views here.
@@ -36,6 +39,14 @@ class BlogPostListAPIView(generics.ListAPIView):
     queryset = BlogPost.objects.all()
     serializer_class = BlogPostSerializer
 
+
+class BlogPostRecentListAPIView(generics.ListAPIView):
+    queryset = BlogPost.objects.all()
+    serializer_class = BlogPostSerializer
+
+
+    def get_queryset(self):
+        return super().get_queryset().order_by("last_updated")[:5]
 
 class BlogPostReactionAPIView(generics.CreateAPIView):
    queryset = BlogPost.objects.all()
@@ -94,3 +105,41 @@ class BlogPostRemoveReactionAPIView(generics.DestroyAPIView):
         self.perform_destroy(obj)
         
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
+
+
+# comment on a particular blog post
+
+class BlogCommentAPIView(generics.CreateAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = BlogCommentSerializer
+
+
+# Work on this later
+class BlogReplyAPIView(generics.RetrieveUpdateAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = BlogReplySerializer
+    # lookup_field = "comment_id"
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        print(self.get_queryset())
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+
+        data = serializer.validated_data
+        blog_post = data.pop("blog_post")
+        reply = Comment.objects.create(**data)
+        print(instance.reply.all())
+        # instance.reply.add(reply)
+        # instance.save()
+        
+        if getattr(instance, '_prefetched_objects_cache', None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            instance._prefetched_objects_cache = {}
+
+        return Response(serializer.data)

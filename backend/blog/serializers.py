@@ -2,7 +2,8 @@ from rest_framework import serializers
 from .models import (
     BlogPost,
     TableOfContent,
-    Reaction
+    Reaction,
+    Comment
     )
 
 
@@ -27,11 +28,23 @@ class BlogPostCreateSerializer(serializers.ModelSerializer):
         instance.table_of_content = table_of_content
         instance.save()
         return instance
-    
+
+
+class BlogCommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ["id", "user", "body", "blog_post", "comment"]
+
+
+class BlogReplySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ["user", "body", "blog_post", "comment"]
 
 class BlogPostSerializer(serializers.ModelSerializer):
     total_likes = serializers.SerializerMethodField()
     total_dislikes = serializers.SerializerMethodField()
+
     class Meta:
         model = BlogPost
         fields = ["author", "user_that_last_updated", 

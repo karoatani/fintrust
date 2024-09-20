@@ -15,7 +15,7 @@ class BlogPost(models.Model):
     
     category = models.ForeignKey("Category", on_delete=models.SET_NULL, null=True, blank=True)
     tags = models.ManyToManyField("Tag")
-    comments = models.ForeignKey("Comment", on_delete=models.CASCADE, null=True, blank=True)
+    comments = models.ForeignKey("Comment", on_delete=models.CASCADE, null=True, blank=True, default=None,related_name="blog_post")
     
     
     is_archive = models.BooleanField(default=False)
